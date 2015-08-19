@@ -7,7 +7,7 @@
 
 #Sets Execution Policy and variable to be passed to function
 set-executionpolicy remotesigned -force
-$Hostnames = @("jlafave_lt")
+$Hostnames = get-content C:\users\jlafave\GIT\newb-reboot\Servers.txt
      
 
 
