@@ -8,7 +8,7 @@
 #Sets Execution Policy and variable to be passed to function
 set-executionpolicy remotesigned -force
 $Hostnames = @("jlafave_lt")
-$date = Get-Date     
+     
 
 
 #Sets a Loop through the Array 
@@ -19,7 +19,7 @@ Foreach ($HostName in $HostNames)
     Try
 
     {
-         Get-WmiObject –class Win32_OperatingSystem –computername $hostname
+         Test-Connection -ComputerName $hostname -count 1 -Quiet
     }
      
         Catch 
@@ -31,7 +31,7 @@ Foreach ($HostName in $HostNames)
 
     if ($continue) 
     {
-        restart-computer -computername $hostname -force
+       restart-computer -computername $hostname -force
     }
 
                      
@@ -41,25 +41,36 @@ Foreach ($HostName in $HostNames)
 Start-Sleep -Seconds 120
 
 
-#Tests Server Availability
-$uptime = Foreach ($hostname in $Hostnames)
-{
-     Test-Connection -ComputerName $hostname -Count 1
+#TEST Availability and sends email based on test results
+Get-Content c:\users\jlafave\git\newb-reboot\servers.txt | foreach { 
+
+    if (-not (Test-Connection -ComputerName $_ -count 1 -Quiet)) 
+        
+       {
+        #Sets Value for Reboot Confirmation
+        $emailSmtpServer = "mail.autopartintl.com"
+        $emailFrom = "Administrator <Administrator2@autopartintl.com>"
+        $emailTo = "josh.lafave@autopartintl.com"
+        $emailSubject = "Aconnex Server $_ Reboot Failed"
+        $emailBody = "Please check Aconnex server for status."
+
+        #Sends Email to dl-OPSITS@autopartintl.com
+        Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
+       } 
+
+    else 
+       {
+        $emailSmtpServer = "mail.autopartintl.com"
+        $emailFrom = "Administrator <Administrator2@autopartintl.com>"
+        $emailTo = "josh.lafave@autopartintl.com"
+        $emailSubject = "Success!! Aconnex Server $_"
+        $emailBody = "Reboot completed successfully."
+
+        #Sends Email to dl-OPSIT@autopartintl.com
+        Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
+       }
+        
 }
 
 
-#Sets Valiable for Reboot Confirmation
-$emailSmtpServer = "mail.autopartintl.com"
-$emailFrom = "Administrator <Administrator2@autopartintl.com>"
-$emailTo = "josh.lafave@autopartintl.com"
-$emailSubject = "Aconnex Server Reboot Status"
-$emailBody = "
-Aconnex servers have been rebooted.
 
-
-
-$uptime
-"
-
-#Sends Email to dl-OPSITS@autopartintl.com
-Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
