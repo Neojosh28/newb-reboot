@@ -18,7 +18,7 @@ $emailBody = ""
 
 Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
 
-$hostnames= "FQDN of Server or Servers Sperated with A comma"
+$hostnames= "FQDN of Server or Servers Seperated with A comma"
 
 Start-Sleep -Seconds 1800
 
@@ -26,8 +26,8 @@ Foreach ($HostName in $HostNames)
 {
      $Continue = $True
 
-   if (-not (Test-Connection -ComputerName $hostname -count 1 -Quiet)) 
-             
+   if (-not (Test-Connection -ComputerName $hostname -count 1 -Quiet))
+
                 {
                 $continue = $False
                 #Sets Value for Reboot Confirmation Change as Needed
@@ -40,14 +40,14 @@ Foreach ($HostName in $HostNames)
                 #Sends Email
                 Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
 
-                } 
+                }
 
-   else 
+   else
                 {
                    restart-computer -computername $hostname -force
                 }
 
-                     
+
 }
 
 
@@ -55,8 +55,8 @@ Start-Sleep -Seconds 900
 
 Foreach ($HostName in $HostNames)
 {
-if (-not (Test-Connection -ComputerName $hostname -count 1 -Quiet)) 
-        
+if (-not (Test-Connection -ComputerName $hostname -count 1 -Quiet))
+
        {
         #Sets Value for Reboot Confirmation Change as Needed
         $emailSmtpServer = ""
@@ -67,8 +67,8 @@ if (-not (Test-Connection -ComputerName $hostname -count 1 -Quiet))
 
         #Sends Email
         Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
-       } 
-      else 
+       }
+      else
        {
         $emailSmtpServer = ""
         $emailFrom = ""
@@ -79,6 +79,3 @@ if (-not (Test-Connection -ComputerName $hostname -count 1 -Quiet))
         Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
        }
 }
-
-
-
