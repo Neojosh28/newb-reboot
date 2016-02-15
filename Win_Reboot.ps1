@@ -7,69 +7,77 @@
 
 #Sets Execution Policy and variable to be passed to function
 set-executionpolicy remotesigned -force
-$Hostnames = "FQDN of Reboot Target"
-     
 
 
-#Sets a Loop through the Array 
+#Sets Value for Email message
+$emailSmtpServer = "SMTP of Mail Server"
+$emailFrom = "From Address"
+$emailTo = "To Address"
+$emailSubject = ""
+$emailBody = ""
+
+Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
+
+$hostnames= "FQDN of Server or Servers Sperated with A comma"
+
+Start-Sleep -Seconds 1800
+
 Foreach ($HostName in $HostNames)
 {
      $Continue = $True
 
-    Try
+   if (-not (Test-Connection -ComputerName $hostname -count 1 -Quiet)) 
+             
+                {
+                $continue = $False
+                #Sets Value for Reboot Confirmation Change as Needed
+                $emailSmtpServer = ""
+                $emailFrom = ""
+                $emailTo = ""
+                $emailSubject = "$hostname Reboot Failed"
+                $emailBody = "$hostname is not online to respond to reboot request."
 
-    {
-         Test-Connection -ComputerName $hostname -count 1 -Quiet
-    }
-     
-        Catch 
+                #Sends Email
+                Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
 
-        {
-        $continue = $False
-           Write-host "Unable to Reboot $hostname"
-        } 
+                } 
 
-    if ($continue) 
-    {
-       restart-computer -computername $hostname -force
-    }
+   else 
+                {
+                   restart-computer -computername $hostname -force
+                }
 
                      
 }
 
-#Pauses Execution for 2 minutes
-Start-Sleep -Seconds 120
 
+Start-Sleep -Seconds 900
 
-#TEST Availability and sends email based on results
-Get-Content c:\users\jlafave\git\newb-reboot\servers.txt | foreach { 
-
-    if (-not (Test-Connection -ComputerName $_ -count 1 -Quiet)) 
+Foreach ($HostName in $HostNames)
+{
+if (-not (Test-Connection -ComputerName $hostname -count 1 -Quiet)) 
         
        {
         #Sets Value for Reboot Confirmation Change as Needed
         $emailSmtpServer = ""
-        $emailFrom = ">"
+        $emailFrom = ""
         $emailTo = ""
-        $emailSubject = "Server $_ Reboot Failed"
-        $emailBody = "Please check server for status."
+        $emailSubject = "$hostname Did Not Respond Verify Cause"
+        $emailBody = "$hostname did not restart correctly."
 
-        #Sends Email to dl-OPSITS@autopartintl.com
+        #Sends Email
         Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
        } 
-
-    else 
+      else 
        {
         $emailSmtpServer = ""
         $emailFrom = ""
         $emailTo = ""
-        $emailSubject = "Success!!"
-        $emailBody = "Reboot completed successfully."
-
-        #Sets Value for Reboot Confirmation Change as Needed
+        $emailSubject = ""
+        $emailBody = ""
+        #Sets Value for Email message
         Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
        }
-        
 }
 
 
