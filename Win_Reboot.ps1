@@ -7,7 +7,7 @@
 
 #Sets Execution Policy and variable to be passed to function
 set-executionpolicy remotesigned -force
-$Hostnames = get-content C:\users\jlafave\GIT\newb-reboot\Servers.txt
+$Hostnames = "FQDN of Reboot Target"
      
 
 
@@ -41,18 +41,18 @@ Foreach ($HostName in $HostNames)
 Start-Sleep -Seconds 120
 
 
-#TEST Availability and sends email based on test results
+#TEST Availability and sends email based on results
 Get-Content c:\users\jlafave\git\newb-reboot\servers.txt | foreach { 
 
     if (-not (Test-Connection -ComputerName $_ -count 1 -Quiet)) 
         
        {
-        #Sets Value for Reboot Confirmation
-        $emailSmtpServer = "mail.autopartintl.com"
-        $emailFrom = "Administrator <Administrator2@autopartintl.com>"
-        $emailTo = "josh.lafave@autopartintl.com"
-        $emailSubject = "Aconnex Server $_ Reboot Failed"
-        $emailBody = "Please check Aconnex server for status."
+        #Sets Value for Reboot Confirmation Change as Needed
+        $emailSmtpServer = ""
+        $emailFrom = ">"
+        $emailTo = ""
+        $emailSubject = "Server $_ Reboot Failed"
+        $emailBody = "Please check server for status."
 
         #Sends Email to dl-OPSITS@autopartintl.com
         Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
@@ -60,13 +60,13 @@ Get-Content c:\users\jlafave\git\newb-reboot\servers.txt | foreach {
 
     else 
        {
-        $emailSmtpServer = "mail.autopartintl.com"
-        $emailFrom = "Administrator <Administrator2@autopartintl.com>"
-        $emailTo = "josh.lafave@autopartintl.com"
-        $emailSubject = "Success!! Aconnex Server $_"
+        $emailSmtpServer = ""
+        $emailFrom = ""
+        $emailTo = ""
+        $emailSubject = "Success!!"
         $emailBody = "Reboot completed successfully."
 
-        #Sends Email to dl-OPSIT@autopartintl.com
+        #Sets Value for Reboot Confirmation Change as Needed
         Send-MailMessage -To $emailTo -From $emailFrom -Subject $emailSubject -Body $emailBody -SmtpServer $emailSmtpServer
        }
         
